@@ -143,6 +143,10 @@ class SnippetEditorFragment : Fragment() {
     }
 
     private fun setupButtons() {
+        binding.btnRules.setOnClickListener {
+            navigateToRules()
+        }
+
         binding.btnCopy.setOnClickListener {
             getEditorContent { content ->
                 copyToClipboard(content)
@@ -447,6 +451,18 @@ class SnippetEditorFragment : Fragment() {
         }
         _binding = null
         super.onDestroyView()
+    }
+
+    private fun navigateToRules() {
+        if (args.isNew) {
+            toast("请先保存代码片段后再设置规则")
+            return
+        }
+        val action = SnippetEditorFragmentDirections.actionSnippetEditorToRules(
+            zoneId = args.zoneId,
+            snippetName = args.snippetName,
+        )
+        findNavController().navigate(action)
     }
 
     inner class JavaScriptBridge {
