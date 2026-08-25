@@ -2286,7 +2286,7 @@ interface CloudFlareApi {
 
     @GET("zones/{zone_id}/snippets/rules")
     suspend fun listSnippetRules(
-        @Header("Authorization") token=[REDACTED],
+        @Header("Authorization") token: String?,
         @Header("X-Auth-Email") email: String?,
         @Header("X-Auth-Key") apiKey: String?,
         @Path("zone_id") zoneId: String,
@@ -2294,7 +2294,7 @@ interface CloudFlareApi {
 
     @GET("zones/{zone_id}/snippets/rules/{rule_id}")
     suspend fun getSnippetRule(
-        @Header("Authorization") token=[REDACTED],
+        @Header("Authorization") token: String?,
         @Header("X-Auth-Email") email: String?,
         @Header("X-Auth-Key") apiKey: String?,
         @Path("zone_id") zoneId: String,
@@ -2303,7 +2303,7 @@ interface CloudFlareApi {
 
     @POST("zones/{zone_id}/snippets/rules")
     suspend fun createSnippetRule(
-        @Header("Authorization") token=[REDACTED],
+        @Header("Authorization") token: String?,
         @Header("X-Auth-Email") email: String?,
         @Header("X-Auth-Key") apiKey: String?,
         @Path("zone_id") zoneId: String,
@@ -2312,7 +2312,7 @@ interface CloudFlareApi {
 
     @PUT("zones/{zone_id}/snippets/rules/{rule_id}")
     suspend fun updateSnippetRule(
-        @Header("Authorization") token=[REDACTED],
+        @Header("Authorization") token: String?,
         @Header("X-Auth-Email") email: String?,
         @Header("X-Auth-Key") apiKey: String?,
         @Path("zone_id") zoneId: String,
@@ -2322,7 +2322,7 @@ interface CloudFlareApi {
 
     @DELETE("zones/{zone_id}/snippets/rules/{rule_id}")
     suspend fun deleteSnippetRule(
-        @Header("Authorization") token=[REDACTED],
+        @Header("Authorization") token: String?,
         @Header("X-Auth-Email") email: String?,
         @Header("X-Auth-Key") apiKey: String?,
         @Path("zone_id") zoneId: String,
