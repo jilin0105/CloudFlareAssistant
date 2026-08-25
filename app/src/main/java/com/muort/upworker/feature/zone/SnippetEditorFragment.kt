@@ -455,7 +455,7 @@ class SnippetEditorFragment : Fragment() {
 
     private fun navigateToRules() {
         if (args.isNew) {
-            toast("请先保存代码片段后再设置规则")
+            Toast.makeText(requireContext(), "请先保存代码片段后再设置规则", Toast.LENGTH_SHORT).show()
             return
         }
         val action = SnippetEditorFragmentDirections.actionSnippetEditorToRules(
