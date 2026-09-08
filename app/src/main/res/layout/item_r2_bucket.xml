@@ -29,12 +29,20 @@
                 android:text="@string/r2_bucket_name" />
 
             <TextView
+                android:id="@+id/bucketIdText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="?android:textColorSecondary"
+                android:layout_marginTop="4dp" />
+
+            <TextView
                 android:id="@+id/bucketLocationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:textColor="?android:textColorSecondary"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:text="@string/r2_location" />
 
         </LinearLayout>

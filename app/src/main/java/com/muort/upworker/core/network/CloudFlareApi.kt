@@ -1207,6 +1207,19 @@ interface CloudFlareApi {
         @Header("X-Auth-Key") apiKey: String?,
         @Body request: AnalyticsGraphQLRequest
     ): Response<AccountAnalyticsGraphQLResponse>
+
+    /**
+     * GraphQL Analytics API - Gateway DNS 查询分析
+     * 数据集: gatewayResolverQueriesAdaptiveGroups
+     * https://developers.cloudflare.com/cloudflare-one/insights/analytics/gateway/
+     */
+    @POST("graphql")
+    suspend fun queryGatewayDnsAnalytics(
+        @Header("Authorization") token: String?,
+        @Header("X-Auth-Email") email: String?,
+        @Header("X-Auth-Key") apiKey: String?,
+        @Body request: AnalyticsGraphQLRequest
+    ): Response<GatewayDnsAnalyticsResponse>
     
     // ==================== Zero Trust - Access Applications ====================
     

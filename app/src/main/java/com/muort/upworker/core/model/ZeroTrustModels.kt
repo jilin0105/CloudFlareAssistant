@@ -616,3 +616,73 @@ data class ServiceTokenRequest(
     @SerializedName("name") val name: String,
     @SerializedName("duration") val duration: String? = "8760h" // Default: 1 year
 )
+
+// ==================== Gateway DNS Analytics ====================
+
+/**
+ * Gateway DNS 分析 GraphQL 响应
+ * 数据集: gatewayResolverQueriesAdaptiveGroups
+ * https://developers.cloudflare.com/cloudflare-one/insights/analytics/gateway/
+ */
+data class GatewayDnsAnalyticsResponse(
+    @SerializedName("data") val data: GatewayDnsAnalyticsData?,
+    @SerializedName("errors") val errors: List<GraphQLError>?
+)
+
+data class GatewayDnsAnalyticsData(
+    @SerializedName("viewer") val viewer: GatewayDnsViewer?
+)
+
+data class GatewayDnsViewer(
+    @SerializedName("accounts") val accounts: List<GatewayDnsAccountNode>?
+)
+
+data class GatewayDnsAccountNode(
+    @SerializedName("ops") val ops: List<GatewayDnsGroup>?,
+    @SerializedName("countries") val countries: List<GatewayDnsGroup>?,
+    @SerializedName("locations") val locations: List<GatewayDnsGroup>?
+)
+
+data class GatewayDnsGroup(
+    @SerializedName("count") val count: Long,
+    @SerializedName("dimensions") val dimensions: GatewayDnsDimensions?
+)
+
+data class GatewayDnsDimensions(
+    @SerializedName("resolverDecision") val resolverDecision: String? = null,
+    @SerializedName("srcIpCountry") val srcIpCountry: String? = null,
+    @SerializedName("locationName") val locationName: String? = null
+)
+
+/**
+ * DNS 操作条目（按 resolverDecision 分组）
+ */
+data class DnsOperationItem(
+    val resolverDecision: String,
+    val count: Long
+)
+
+/**
+ * DNS 国家/地区条目（按 srcCountry 分组）
+ */
+data class DnsCountryItem(
+    val countryCode: String,
+    val count: Long
+)
+
+/**
+ * DNS 位置条目（按 locationName 分组）
+ */
+data class DnsLocationItem(
+    val locationName: String,
+    val count: Long
+)
+
+/**
+ * Gateway DNS 查询分析聚合结果（UI 层使用）
+ */
+data class GatewayDnsAnalytics(
+    val operations: List<DnsOperationItem> = emptyList(),
+    val countries: List<DnsCountryItem> = emptyList(),
+    val locations: List<DnsLocationItem> = emptyList()
+)

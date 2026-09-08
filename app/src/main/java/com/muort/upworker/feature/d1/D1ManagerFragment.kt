@@ -443,7 +443,17 @@ class D1ManagerFragment : Fragment() {
                 nameText.text = db.name
                 uuidText.text = itemView.context.getString(R.string.d1_db_id_label, db.uuid)
                 itemView.setOnClickListener { onDatabaseClick(db) }
+                itemView.setOnLongClickListener {
+                    copyToClipboard(itemView.context, db.uuid, "Database ID")
+                    true
+                }
                 deleteBtn.setOnClickListener { onDeleteClick(db) }
+            }
+
+            private fun copyToClipboard(context: android.content.Context, text: String, label: String) {
+                val clipboardManager = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                clipboardManager.setPrimaryClip(android.content.ClipData.newPlainText(label, text))
+                android.widget.Toast.makeText(context, context.getString(R.string.zt_location_copy_label_format, label), android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }

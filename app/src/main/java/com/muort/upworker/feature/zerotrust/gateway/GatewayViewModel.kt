@@ -235,4 +235,36 @@ class GatewayViewModel @Inject constructor(
         _loadingState.value = false
         return result
     }
+
+    // ==================== Gateway DNS Analytics ====================
+
+    private val _dnsAnalytics = MutableStateFlow<GatewayDnsAnalytics?>(null)
+    val dnsAnalytics: StateFlow<GatewayDnsAnalytics?> = _dnsAnalytics.asStateFlow()
+
+    private val _dnsAnalyticsLoading = MutableStateFlow(false)
+    val dnsAnalyticsLoading: StateFlow<Boolean> = _dnsAnalyticsLoading.asStateFlow()
+
+    private val _dnsAnalyticsError = MutableStateFlow<String?>(null)
+    val dnsAnalyticsError: StateFlow<String?> = _dnsAnalyticsError.asStateFlow()
+
+    /**
+     * Load Gateway DNS query analytics
+     */
+    suspend fun loadDnsAnalytics(account: Account, timeRange: TimeRange = TimeRange.SEVEN_DAYS) {
+        _dnsAnalyticsLoading.value = true
+        _dnsAnalyticsError.value = null
+        val result = zeroTrustRepository.getGatewayDnsAnalytics(account, timeRange)
+        when (result) {
+            is Resource.Success -> {
+                _dnsAnalytics.value = result.data
+                Timber.d("Gateway DNS analytics loaded")
+            }
+            is Resource.Error -> {
+                _dnsAnalyticsError.value = result.message
+                Timber.e("Gateway DNS analytics failed: ${result.message}")
+            }
+            is Resource.Loading -> {}
+        }
+        _dnsAnalyticsLoading.value = false
+    }
 }

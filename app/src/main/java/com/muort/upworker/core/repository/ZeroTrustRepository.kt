@@ -856,7 +856,102 @@ class ZeroTrustRepository @Inject constructor(
                 }
             }
         }
-    
+
+    // ==================== Gateway DNS Analytics ====================
+
+    /**
+     * 获取 Gateway DNS 查询分析数据
+     * 数据集: gatewayResolverQueriesAdaptiveGroups
+     * 包含: DNS 操作(resolverDecision)、国家/地区(srcIpCountry)、DNS 位置(locationName)
+     */
+    suspend fun getGatewayDnsAnalytics(
+        account: Account,
+        timeRange: TimeRange = TimeRange.SEVEN_DAYS
+    ): Resource<GatewayDnsAnalytics> = withContext(Dispatchers.IO) {
+        safeApiCall {
+            val query = """
+                query GatewayDnsAnalytics(${'$'}accountTag: string!, ${'$'}since: Time!, ${'$'}until: Time!) {
+                  viewer {
+                    accounts(filter: { accountTag: ${'$'}accountTag }) {
+                      ops: gatewayResolverQueriesAdaptiveGroups(
+                        filter: { datetime_geq: ${'$'}since, datetime_leq: ${'$'}until }
+                        limit: 100
+                      ) {
+                        count
+                        dimensions { resolverDecision }
+                      }
+                      countries: gatewayResolverQueriesAdaptiveGroups(
+                        filter: { datetime_geq: ${'$'}since, datetime_leq: ${'$'}until }
+                        limit: 10
+                      ) {
+                        count
+                        dimensions { srcIpCountry }
+                      }
+                      locations: gatewayResolverQueriesAdaptiveGroups(
+                        filter: { datetime_geq: ${'$'}since, datetime_leq: ${'$'}until }
+                        limit: 10
+                      ) {
+                        count
+                        dimensions { locationName }
+                      }
+                    }
+                  }
+                }
+            """.trimIndent()
+
+            val variables = mapOf(
+                "accountTag" to account.accountId,
+                "since" to timeRange.getStartDateTime(),
+                "until" to timeRange.getEndDateTime()
+            )
+
+            val response = api.queryGatewayDnsAnalytics(
+                token = AuthHelper.getBearerToken(account),
+                email = AuthHelper.getEmail(account),
+                apiKey = AuthHelper.getGlobalApiKey(account),
+                request = AnalyticsGraphQLRequest(query = query, variables = variables)
+            )
+
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body?.errors != null && body.errors.isNotEmpty()) {
+                    val errorMsg = body.errors.firstOrNull()?.message ?: "GraphQL query failed"
+                    Timber.e("Gateway DNS analytics GraphQL error: $errorMsg")
+                    Resource.Error(errorMsg)
+                } else {
+                    val accountNode = body?.data?.viewer?.accounts?.firstOrNull()
+                    val analytics = GatewayDnsAnalytics(
+                        operations = accountNode?.ops
+                            ?.mapNotNull { g ->
+                                g.dimensions?.resolverDecision?.let { DnsOperationItem(it, g.count) }
+                            }
+                            ?.sortedByDescending { it.count }
+                            ?: emptyList(),
+                        countries = accountNode?.countries
+                            ?.mapNotNull { g ->
+                                g.dimensions?.srcIpCountry?.let { DnsCountryItem(it, g.count) }
+                            }
+                            ?.sortedByDescending { it.count }
+                            ?: emptyList(),
+                        locations = accountNode?.locations
+                            ?.mapNotNull { g ->
+                                g.dimensions?.locationName?.let { DnsLocationItem(it, g.count) }
+                            }
+                            ?.sortedByDescending { it.count }
+                            ?: emptyList()
+                    )
+                    Timber.d("Gateway DNS analytics loaded: ops=${analytics.operations.size}, " +
+                            "countries=${analytics.countries.size}, locations=${analytics.locations.size}")
+                    Resource.Success(analytics)
+                }
+            } else {
+                val errorMsg = "HTTP ${response.code()}"
+                Timber.e("Gateway DNS analytics request failed: $errorMsg")
+                Resource.Error(errorMsg)
+            }
+        }
+    }
+
     // ==================== Devices ====================
     
     /**

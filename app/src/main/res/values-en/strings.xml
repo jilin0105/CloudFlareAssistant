@@ -1195,6 +1195,31 @@
     <string name="zt_gateway_tab_rules">Rules</string>
     <string name="zt_gateway_tab_lists">Lists</string>
     <string name="zt_gateway_tab_locations">Locations</string>
+    <string name="zt_gateway_tab_analytics">Analytics</string>
+
+    <!-- Gateway DNS Analytics -->
+    <string name="zt_gateway_dns_analytics_title">Gateway DNS Query Insights</string>
+    <string name="zt_gateway_dns_operations">DNS Operations</string>
+    <string name="zt_gateway_dns_countries">DNS Country/Region</string>
+    <string name="zt_gateway_dns_locations">Top DNS Locations</string>
+    <string name="zt_gateway_dns_blocked_users">Top Blocked Users</string>
+    <string name="zt_gateway_dns_allowed_users">Top Allowed Users</string>
+    <string name="zt_gateway_dns_no_identity">No identity captured</string>
+    <string name="zt_gateway_dns_top_count">%1$d items</string>
+    <string name="zt_gateway_dns_empty">No data</string>
+    <string name="zt_gateway_dns_loading">Loading…</string>
+    <string name="zt_gateway_dns_error_format">Failed to load: %1$s</string>
+    <string name="zt_gateway_dns_retry">Tap to retry</string>
+    <!-- Resolver Decision mapping -->
+    <string name="zt_gateway_dns_decision_allowed_no_policy">Allowed on no policy match</string>
+    <string name="zt_gateway_dns_decision_allowed_no_location">Allowed on no location match</string>
+    <string name="zt_gateway_dns_decision_override_applied">Override applied</string>
+    <string name="zt_gateway_dns_decision_override_safesearch">Override for SafeSearch</string>
+    <string name="zt_gateway_dns_decision_allowed_rule">Allowed by rule</string>
+    <string name="zt_gateway_dns_decision_blocked_rule">Blocked by rule</string>
+    <string name="zt_gateway_dns_decision_blocked_category">Blocked by category</string>
+    <string name="zt_gateway_dns_decision_blocked_always_category">Always blocked category</string>
+    <string name="zt_gateway_dns_decision_unknown">Unknown</string>
 
     <!-- GatewayListsFragment -->
     <string name="zt_list_type_domain">Domain</string>

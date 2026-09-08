@@ -1,5 +1,8 @@
 package com.muort.upworker.feature.r2
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -895,10 +898,15 @@ class R2Fragment : Fragment() {
             
             fun bind(bucket: R2Bucket) {
                 binding.bucketNameText.text = bucket.name
+                binding.bucketIdText.text = binding.root.context.getString(R.string.d1_db_id_label, bucket.name)
                 binding.bucketLocationText.text = bucket.location?.let { binding.root.context.getString(R.string.r2_bucket_location_template, it) } ?: binding.root.context.getString(R.string.r2_bucket_location_default)
                 
                 binding.root.setOnClickListener {
                     onBucketClick(bucket)
+                }
+                binding.root.setOnLongClickListener {
+                    copyToClipboard(binding.root.context, bucket.name, "Bucket ID")
+                    true
                 }
                 
                 binding.bucketMenuButton.setOnClickListener { view ->
@@ -920,6 +928,12 @@ class R2Fragment : Fragment() {
                         show()
                     }
                 }
+            }
+
+            private fun copyToClipboard(context: Context, text: String, label: String) {
+                val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboardManager.setPrimaryClip(ClipData.newPlainText(label, text))
+                Toast.makeText(context, context.getString(R.string.zt_location_copy_label_format, label), Toast.LENGTH_SHORT).show()
             }
         }
     }

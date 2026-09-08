@@ -1,10 +1,14 @@
 package com.muort.upworker.feature.kv
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -278,10 +282,14 @@ class KvFragment : Fragment() {
             
             fun bind(namespace: KvNamespace) {
                 binding.namespaceTitleText.text = namespace.title
-                binding.namespaceIdText.text = "ID: ${namespace.id}"
+                binding.namespaceIdText.text = binding.root.context.getString(R.string.d1_db_id_label, namespace.id)
                 
                 binding.root.setOnClickListener {
                     onNamespaceClick(namespace)
+                }
+                binding.root.setOnLongClickListener {
+                    copyToClipboard(binding.root.context, namespace.id, "Namespace ID")
+                    true
                 }
                 
                 binding.namespaceMenuButton.setOnClickListener { view ->
@@ -301,6 +309,12 @@ class KvFragment : Fragment() {
                         show()
                     }
                 }
+            }
+
+            private fun copyToClipboard(context: Context, text: String, label: String) {
+                val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboardManager.setPrimaryClip(ClipData.newPlainText(label, text))
+                Toast.makeText(context, context.getString(R.string.zt_location_copy_label_format, label), Toast.LENGTH_SHORT).show()
             }
         }
     }

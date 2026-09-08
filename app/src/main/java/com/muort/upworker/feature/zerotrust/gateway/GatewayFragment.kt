@@ -42,6 +42,7 @@ class GatewayFragment : Fragment() {
                 0 -> getString(R.string.zt_gateway_tab_rules)
                 1 -> getString(R.string.zt_gateway_tab_lists)
                 2 -> getString(R.string.zt_gateway_tab_locations)
+                3 -> getString(R.string.zt_gateway_tab_analytics)
                 else -> ""
             }
         }.attach()

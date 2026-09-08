@@ -1176,6 +1176,31 @@
     <string name="zt_gateway_tab_rules">规则</string>
     <string name="zt_gateway_tab_lists">列表</string>
     <string name="zt_gateway_tab_locations">位置</string>
+    <string name="zt_gateway_tab_analytics">分析</string>
+
+    <!-- Gateway DNS Analytics -->
+    <string name="zt_gateway_dns_analytics_title">网关 DNS 查询见解</string>
+    <string name="zt_gateway_dns_operations">DNS 操作</string>
+    <string name="zt_gateway_dns_countries">DNS 国家/地区</string>
+    <string name="zt_gateway_dns_locations">排名靠前的 DNS 位置</string>
+    <string name="zt_gateway_dns_blocked_users">阻止次数最多的用户</string>
+    <string name="zt_gateway_dns_allowed_users">允许次数最多的用户</string>
+    <string name="zt_gateway_dns_no_identity">未捕获标识信息</string>
+    <string name="zt_gateway_dns_top_count">%1$d 条</string>
+    <string name="zt_gateway_dns_empty">暂无数据</string>
+    <string name="zt_gateway_dns_loading">加载中…</string>
+    <string name="zt_gateway_dns_error_format">加载失败: %1$s</string>
+    <string name="zt_gateway_dns_retry">点击重试</string>
+    <!-- Resolver Decision 映射 -->
+    <string name="zt_gateway_dns_decision_allowed_no_policy">无策略匹配时允许</string>
+    <string name="zt_gateway_dns_decision_allowed_no_location">无匹配位置时允许</string>
+    <string name="zt_gateway_dns_decision_override_applied">已应用覆盖</string>
+    <string name="zt_gateway_dns_decision_override_safesearch">安全搜索覆盖</string>
+    <string name="zt_gateway_dns_decision_allowed_rule">规则允许</string>
+    <string name="zt_gateway_dns_decision_blocked_rule">规则阻止</string>
+    <string name="zt_gateway_dns_decision_blocked_category">类别阻止</string>
+    <string name="zt_gateway_dns_decision_blocked_always_category">始终阻止的类别</string>
+    <string name="zt_gateway_dns_decision_unknown">未知</string>
 
     <!-- GatewayListsFragment -->
     <string name="zt_list_type_domain">域名</string>
