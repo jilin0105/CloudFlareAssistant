@@ -64,10 +64,12 @@ class WorkerViewModelPostUploadTest {
     @After fun tear() = Dispatchers.resetMain()
 
     // ------------------------------------------------------------------
-    // Test 1: observability stage Success → UiMessage matches worker_post_observability_applying
+    // Test 1: post-upload stage Success emission policy
+    //   - Observability / Subdomain success messages are SILENCED (no toast spam)
+    //   - Deployment success message IS emitted
     // ------------------------------------------------------------------
     @Test
-    fun `uploadWithPostFlow observability stage Success emits ResourceString`() = runTest {
+    fun `uploadWithPostFlow silences observability and subdomain success but emits deployment success`() = runTest {
         val scriptFile = File.createTempFile("scr_", ".js")
         // Stub getWorkerSettings as Resource.Success (preserve path)
         val emptySettings = WorkerScript(
@@ -108,11 +110,21 @@ class WorkerViewModelPostUploadTest {
         vm.uploadWorkerScriptWithBindings(testAccount, "sc-name", scriptFile)
         advanceUntilIdle()
 
+        val resStrings = emitted.filterIsInstance<UiMessage.ResourceString>()
+        // Observability success is SILENCED (intermediate stage success → no toast)
         assertTrue(
-            "stage observability applying in emitted",
-            emitted.any {
-                it is UiMessage.ResourceString && it.resId == R.string.worker_post_observability_applying
-            }
+            "observability success must be silenced",
+            resStrings.none { it.resId == R.string.worker_post_observability_applying }
+        )
+        // Subdomain success is SILENCED (intermediate stage success → no toast)
+        assertTrue(
+            "subdomain success must be silenced",
+            resStrings.none { it.resId == R.string.worker_post_subdomain_already }
+        )
+        // Deployment success IS emitted (final stage success → toast)
+        assertTrue(
+            "deployment success emitted",
+            resStrings.any { it.resId == R.string.worker_post_deploy_deploying }
         )
     }
 
@@ -313,25 +325,25 @@ class WorkerViewModelPostUploadTest {
         advanceUntilIdle()
 
         val resStrings = emitted.filterIsInstance<UiMessage.ResourceString>()
-        // Stage 1 failure present
+        // Stage 1 failure present (failures always emit)
         assertTrue(
             "stage1 observability failure emitted",
             resStrings.any { it.resId == R.string.worker_post_observability_fail_format }
         )
-        // Stage 2 subdomain still emitted (not aborted)
+        // Stage 2 subdomain success is SILENCED (intermediate stage success → no toast),
+        // but the stage still ran (loop did not abort on stage1 failure — proven by stage3 below).
         assertTrue(
-            "stage2 subdomain emitted after stage1 failure",
-            resStrings.any { it.resId == R.string.worker_post_subdomain_already }
+            "stage2 subdomain success silenced after stage1 failure",
+            resStrings.none { it.resId == R.string.worker_post_subdomain_already }
         )
-        // Stage 3 deployment still emitted (not aborted)
+        // Stage 3 deployment still emitted (not aborted by stage1 failure)
         assertTrue(
             "stage3 deployment emitted after stage1 failure",
             resStrings.any { it.resId == R.string.worker_post_deploy_ok_format }
         )
-        // Exactly 3 post-stage messages + 1 detect log message + 1 original upload success = >=5.
-        // The ordering: upload success message → detect log → observability_fail → subdomain → deploy_ok.
-        // We check that observability_fail (from afterUpload) appears BEFORE deploy_ok to
-        // confirm forEach order-preservation.
+        // Ordering: upload success → detect log → observability_fail → (subdomain silenced) → deploy_ok.
+        // observability_fail must appear BEFORE deploy_ok to confirm forEach order-preservation
+        // and that a stage1 Failure does not abort later stages.
         val idxFail = resStrings.indexOfFirst { it.resId == R.string.worker_post_observability_fail_format }
         val idxDeploy = resStrings.indexOfFirst { it.resId == R.string.worker_post_deploy_ok_format }
         assertTrue(

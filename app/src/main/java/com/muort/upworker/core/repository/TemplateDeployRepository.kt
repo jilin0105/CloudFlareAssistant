@@ -1,4 +1,4 @@
-﻿package com.muort.upworker.core.repository
+package com.muort.upworker.core.repository
 
 import android.content.Context
 import com.google.gson.Gson
@@ -1057,6 +1057,32 @@ class TemplateDeployRepository @Inject constructor(
                                 warnings.add("绑定配置失败: ${bindingResult.message}（项目已部署，请到控制台手动配置）")
                             }
                             is Resource.Loading -> {}
+                        }
+
+                        // ====== Step 5: 新建项目二次部署（使绑定生效）======
+                        // Cloudflare Pages 的绑定（环境变量 / KV / D1 / R2）通过 PATCH 项目接口
+                        // 配置后，仅对后续新部署生效，当前已运行的部署不会自动加载新绑定。
+                        // 因此新建项目首次部署后必须再部署一次，绑定才能真正生效。
+                        if (!projectExists) {
+                            Timber.d("[TemplateDeploy] 检测到新建项目，执行二次部署以使绑定生效")
+                            val secondDeployResult = pagesRepository.createDeployment(
+                                account = account,
+                                projectName = projectName,
+                                branch = branch,
+                                file = sourceFile,
+                                customCompatibilityDate = finalCompatDate,
+                                customCompatibilityFlags = finalCompatFlags,
+                                extraEnvVars = envValues.ifEmpty { null }
+                            )
+                            when (secondDeployResult) {
+                                is Resource.Success -> {
+                                    Timber.d("[TemplateDeploy] 新建项目二次部署成功，绑定已生效")
+                                }
+                                is Resource.Error -> {
+                                    warnings.add("二次部署失败: ${secondDeployResult.message}（绑定已配置，将在下次部署时生效）")
+                                }
+                                is Resource.Loading -> {}
+                            }
                         }
                     }
 

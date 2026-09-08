@@ -1,3 +1,5 @@
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -8,10 +10,15 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
-
+// 加载本地 keystore 签名配置（与 MT.jks 同目录）
+val keystorePropsFile = file("E:\\AI\\keystore.properties")
+val keystoreProps = Properties()
+if (keystorePropsFile.exists()) {
+    FileInputStream(keystorePropsFile).use { keystoreProps.load(it) }
+}
 
 android {
     namespace = "com.muort.upworker"
@@ -37,37 +44,37 @@ android {
     
     signingConfigs {
         create("release") {
-            // 优先使用命令行参数（CI/CD），其次使用本地配置
+            // 优先使用命令行参数（CI/CD），其次使用本地 keystore.properties 配置
             if (project.hasProperty("android.injected.signing.store.file")) {
                 storeFile = file(project.property("android.injected.signing.store.file").toString())
             } else {
-                storeFile = file("E:\\AI\\MT.jks")
+                storeFile = file(keystoreProps.getProperty("storeFile", "E:\\AI\\MT.jks"))
             }
             if (project.hasProperty("android.injected.signing.store.password")) {
                 storePassword = project.property("android.injected.signing.store.password").toString()
             } else {
-                storePassword = "861390202"
+                storePassword = keystoreProps.getProperty("storePassword", "")
             }
             if (project.hasProperty("android.injected.signing.key.alias")) {
                 keyAlias = project.property("android.injected.signing.key.alias").toString()
             } else {
-                keyAlias = "MT"
+                keyAlias = keystoreProps.getProperty("keyAlias", "")
             }
             if (project.hasProperty("android.injected.signing.key.password")) {
                 keyPassword = project.property("android.injected.signing.key.password").toString()
             } else {
-                keyPassword = "861390202"
+                keyPassword = keystoreProps.getProperty("keyPassword", "")
             }
         }
     }
     
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
         freeCompilerArgs += listOf(
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=kotlinx.coroutines.FlowPreview"
